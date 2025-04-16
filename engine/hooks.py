@@ -1,5 +1,5 @@
 LOCATIONS = {
-    'spawn': (160, 120)
+    'spawn': (0, 0)
 }
 
 def gen_hook():

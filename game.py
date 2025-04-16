@@ -2,10 +2,12 @@ import pygame, time
 import engine.pygpen as pp
 
 from engine.systems.game_state_system import GameStateSystem
+from engine.game_analytics import GameAnalytics, send_to_firebase
 
 FPS = 60
 WINDOW_SIZE = (1020, 660)
 DISPLAY_SIZE = (340, 220)
+START_TIME = time.time()
 
 class Game(pp.PygpenGame):
     def load(self):
@@ -45,19 +47,19 @@ class Game(pp.PygpenGame):
         current_time = time.time()
         self.last_update_time = current_time
         
-        self.bg_surf.fill((0, 0, 0))
-        self.display.fill((0, 0, 0))
-        self.ui_surf.fill((0, 0, 0))
+        self.bg_surf.fill((0, 0, 0, 0))
+        self.display.fill((0, 0, 0, 0))
+        self.ui_surf.fill((0, 0, 0, 0))
         
         self.gamestate_system.update(current_time)
         
         if self.gamestate_system.is_in_gameplay():
             self._update_gameplay()
         
+        self.e['ScriptLoader'].update()
+        
         self.e['Renderer'].cycle({'default': self.display, 'ui': self.ui_surf, 'background': self.bg_surf})
         self.e['Window'].cycle({ 'surface': self.display, 'bg_surf': self.bg_surf, 'ui_surf': self.ui_surf})
-    
-        self.e['ScriptLoader'].update()
     
     def _update_gameplay(self):       
         self.camera.update()
@@ -66,4 +68,9 @@ class Game(pp.PygpenGame):
         self.e['EntityGroups'].renderz(offset=self.camera)
 
 if __name__ == "__main__":
-    Game().run()
+    try:
+        Game().run()
+    # game analytics
+    finally:
+        analytics = GameAnalytics.update(START_TIME)
+        send_to_firebase(analytics)
