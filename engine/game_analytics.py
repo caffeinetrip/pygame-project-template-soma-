@@ -2,6 +2,10 @@ from time import time
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 class GameAnalytics:
     @staticmethod
@@ -17,8 +21,8 @@ class GameAnalytics:
 
         return info
 
-BASE_URL = "https://soma-game-analytics-default-rtdb.firebaseio.com"
-SECRET = "mOuuzIFmpsHo9nRUHmo0ygl0G9AnTRL9al9H7ODK"
+BASE_URL = os.getenv("BASE_URL")
+SECRET = os.getenv("SECRET_KEY")
 ENDPOINT = f"/players.json?auth={SECRET}"
 
 def send_to_firebase(data):
